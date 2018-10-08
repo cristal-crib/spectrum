@@ -45,8 +45,8 @@ void InitializeBasicDrivers()
 
 void InitializeDrivers()
 {
-    webDriver.Init(stripCommandQueue, stripConfigQueue);
     ledStripManager.Init(stripCommandQueue, stripConfigQueue, &ledStripDriver);
+    webDriver.Init(stripCommandQueue, stripConfigQueue);
 }
 
 void InitializeWifi()

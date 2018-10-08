@@ -37,7 +37,7 @@ private:
     {
       if (xQueueReceive(_stripCommandQueue, &_receivedState, 0))
       {
-        Serial.println("Received new strip command: H " + String(_receivedState.hue) + " S " + String(_receivedState.saturation) + " B " + String(_receivedState.brightness));
+        Serial.println("StripManager: Received new strip command: H " + String(_receivedState.hue) + " S " + String(_receivedState.saturation) + " B " + String(_receivedState.brightness));
         if (_receivedState.onOff == 0)
         {
           _ledStripDriver->SetFullStripColor(Zero);
@@ -51,7 +51,7 @@ private:
 
       if (xQueueReceive(_stripConfigQueue, &_receivedSegment, 0))
       {
-        Serial.println("Received new strip configuration: Index " + String(_receivedSegment.index) + " Length " + String(_receivedSegment.lenght));
+        Serial.println("StripManager: Received new strip configuration: Index " + String(_receivedSegment.index) + " Length " + String(_receivedSegment.lenght));
         _ledStripDriver->ConfigureSegment(_receivedSegment);
       }
 
