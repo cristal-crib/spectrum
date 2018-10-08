@@ -1,6 +1,7 @@
 #pragma once
 
 #include <LedStripDriver.h>
+#include <Preferences.h>
 
 class LedStripManager
 {
@@ -18,7 +19,7 @@ public:
     xTaskCreate(
         Loop,                  /* Task function. */
         "LedStripManagerLoop", /* String with name of task. */
-        1000,                  /* Stack size in words. */
+        5000,                  /* Stack size in words. */
         NULL,                  /* Parameter passed as input of the task */
         1,                     /* Priority of the task. */
         NULL);                 /* Task handle. */
@@ -53,6 +54,29 @@ private:
       {
         Serial.println("StripManager: Received new strip configuration: Index " + String(_receivedSegment.index) + " Length " + String(_receivedSegment.lenght));
         _ledStripDriver->ConfigureSegment(_receivedSegment);
+
+        try 
+        { 
+          Preferences preferences;
+          preferences.begin("segment-config");
+
+          char ab[10];  //allocate memory
+          sprintf(ab, "segment%d", _receivedSegment.index);
+
+          Serial.println("Writing segment preference to " + String(ab) + " with value of " + String(_receivedSegment.lenght));
+          preferences.putUInt(ab, _receivedSegment.lenght);
+
+          unsigned int length = preferences.getUInt(ab, 0);
+          Serial.println("Readback gave the following value " + String(length));
+
+          preferences.end();
+        } 
+        catch (const std::exception& e) 
+        {
+          Serial.println(e.what());
+        }
+
+        
       }
 
       delay(50);
