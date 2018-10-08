@@ -29,7 +29,7 @@ private:
   static QueueHandle_t _stripCommandQueue;
   static QueueHandle_t _stripConfigQueue;
   static LedStripDriver *_ledStripDriver;
-  static StripState _receivedState;
+  static StripSegmentState _receivedState;
   static StripSegment _receivedSegment;
 
   static void Loop(void *parameter)
@@ -87,5 +87,5 @@ private:
 QueueHandle_t LedStripManager::_stripCommandQueue;
 QueueHandle_t LedStripManager::_stripConfigQueue;
 LedStripDriver *LedStripManager::_ledStripDriver;
-StripState LedStripManager::_receivedState;
+StripSegmentState LedStripManager::_receivedState;
 StripSegment LedStripManager::_receivedSegment;

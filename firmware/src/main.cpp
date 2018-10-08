@@ -34,7 +34,7 @@ void loop()
 
 void InitializeCommandQueues()
 {
-    stripCommandQueue = xQueueCreate(1, sizeof(StripState));
+    stripCommandQueue = xQueueCreate(1, sizeof(StripSegmentState));
     stripConfigQueue = xQueueCreate(1, sizeof(StripSegment));
 }
 
