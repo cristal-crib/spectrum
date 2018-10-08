@@ -1,6 +1,7 @@
 #pragma once
 
 #include <NeoPixelBus.h>
+#include <NeoPixelAnimator.h>
 #include "WebDriver.h"
 
 static const RgbwColor Zero(HtmlColor(0x00000000));
@@ -9,6 +10,19 @@ static const RgbwColor Red(HtmlColor(0x00ff0000));
 static const RgbwColor Green(HtmlColor(0x0000ff00));
 static const RgbwColor Blue(HtmlColor(0x000000ff));
 static const RgbwColor Candle(HtmlColor(0xFFFF0000));
+
+namespace LedStrip
+{
+struct LedStripSegmentState
+{
+};
+
+struct LedSegmentInfo
+{
+  uint16_t StartPosition;
+  uint16_t Length;
+};
+} // namespace LedStrip
 
 class LedStripDriver
 {
@@ -27,7 +41,12 @@ public:
     {
       delete strip;
     }
+    if (animator != NULL)
+    {
+      delete animator;
+    }
     strip = new NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>(pixelCount, _stripDataPin);
+    animator = new NeoPixelAnimator(pixelCount, NEO_MILLISECONDS);
   }
 
   void SetFullStripColor(RgbwColor color)
@@ -54,6 +73,7 @@ public:
 
 protected:
   NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> *strip = NULL;
+  NeoPixelAnimator *animator = NULL;
   uint16_t _pixelCount;
   uint8_t _stripDataPin;
   unsigned int _segmentLengths[10];
