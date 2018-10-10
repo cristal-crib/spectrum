@@ -6,6 +6,8 @@
 class LedStripManager
 {
 public:
+  const static char* PreferenceNamespace;
+
   LedStripManager()
   {
   }
@@ -29,11 +31,11 @@ private:
   static QueueHandle_t _stripCommandQueue;
   static QueueHandle_t _stripConfigQueue;
   static LedStripDriver *_ledStripDriver;
-  static StripSegmentState _receivedState;
-  static StripSegment _receivedSegment;
 
   static void Loop(void *parameter)
   {
+    StripSegmentState _receivedState;
+    StripSegment _receivedSegment;
     while (1)
     {
       if (xQueueReceive(_stripCommandQueue, &_receivedState, 0))
@@ -53,39 +55,41 @@ private:
       if (xQueueReceive(_stripConfigQueue, &_receivedSegment, 0))
       {
         Serial.println("StripManager: Received new strip configuration: Index " + String(_receivedSegment.index) + " Length " + String(_receivedSegment.lenght));
-        _ledStripDriver->ConfigureSegment(_receivedSegment);
-
-        try 
-        { 
-          Preferences preferences;
-          preferences.begin("segment-config");
-
-          char ab[10];  //allocate memory
-          sprintf(ab, "segment%d", _receivedSegment.index);
-
-          Serial.println("Writing segment preference to " + String(ab) + " with value of " + String(_receivedSegment.lenght));
-          preferences.putUInt(ab, _receivedSegment.lenght);
-
-          unsigned int length = preferences.getUInt(ab, 0);
-          Serial.println("Readback gave the following value " + String(length));
-
-          preferences.end();
-        } 
-        catch (const std::exception& e) 
-        {
-          Serial.println(e.what());
-        }
-
-        
+        SaveSegmentConfguration(_receivedSegment);
+        _ledStripDriver->ConfigureSegment(_receivedSegment);        
       }
 
       delay(50);
     }
+  }
+
+  static void SaveSegmentConfguration(StripSegment stripSegment)
+  {
+    char segmentKey[10];
+    sprintf(segmentKey, "segment%d", stripSegment.index);
+
+    Preferences preferences;
+    preferences.begin(PreferenceNamespace);
+    preferences.putUInt(segmentKey, stripSegment.lenght);
+    preferences.end();
+  }
+
+  static unsigned int ReadSegmentConfiguration(int index)
+  {
+    char segmentKey[10];
+    sprintf(segmentKey, "segment%d", index);
+
+    Preferences preferences;
+    preferences.begin(PreferenceNamespace);
+    unsigned int length = preferences.getUInt(segmentKey, -1);
+    preferences.end();
+
+    return length;
   }
 };
 
 QueueHandle_t LedStripManager::_stripCommandQueue;
 QueueHandle_t LedStripManager::_stripConfigQueue;
 LedStripDriver *LedStripManager::_ledStripDriver;
-StripSegmentState LedStripManager::_receivedState;
-StripSegment LedStripManager::_receivedSegment;
+
+const char* LedStripManager::PreferenceNamespace = "segment-config";
