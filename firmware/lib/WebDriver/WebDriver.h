@@ -4,7 +4,7 @@
 #include <string>
 #include "ESPAsyncWebServer.h"
 
-struct StripState
+struct StripSegmentState
 {
   unsigned int index;
   unsigned int onOff;
@@ -148,5 +148,5 @@ protected:
   QueueHandle_t _stripCommandQueue;
   QueueHandle_t _stripConfigQueue;
   unsigned int _onOffState = 0;
-  StripState _stripState[10];
+  StripSegmentState _stripState[10];
 };
