@@ -3,6 +3,8 @@
 #include <LedStripDriver.h>
 #include <Preferences.h>
 
+const int MaxSegments = 10; 
+
 class LedStripManager
 {
 public:
@@ -18,6 +20,17 @@ public:
     _stripConfigQueue = stripConfigQueue;
     _ledStripDriver = ledStripDriver;
 
+    RestoreSegmentConfiguration();
+    StartLoop();
+  }
+
+private:
+  static QueueHandle_t _stripCommandQueue;
+  static QueueHandle_t _stripConfigQueue;
+  static LedStripDriver *_ledStripDriver;
+
+  void StartLoop()
+  {
     xTaskCreate(
         Loop,                  /* Task function. */
         "LedStripManagerLoop", /* String with name of task. */
@@ -27,10 +40,21 @@ public:
         NULL);                 /* Task handle. */
   }
 
-private:
-  static QueueHandle_t _stripCommandQueue;
-  static QueueHandle_t _stripConfigQueue;
-  static LedStripDriver *_ledStripDriver;
+  void RestoreSegmentConfiguration()
+  {
+    int configurations[MaxSegments];
+    ReadSegmentConfigurations(configurations);
+    
+    for(size_t i = 0; i < MaxSegments; i++)
+    {
+      StripSegment segment;
+      segment.index = i;
+      segment.lenght = configurations[i];
+      _ledStripDriver->ConfigureSegment(segment);
+    }
+
+    //_ledStripDriver->SetFullStripColor(White);
+  }
 
   static void Loop(void *parameter)
   {
@@ -81,10 +105,26 @@ private:
 
     Preferences preferences;
     preferences.begin(PreferenceNamespace);
-    unsigned int length = preferences.getUInt(segmentKey, -1);
+    unsigned int length = preferences.getUInt(segmentKey, 0);
     preferences.end();
 
     return length;
+  }
+
+  static void ReadSegmentConfigurations(int configurations[])
+  {
+    char segmentKey[10];
+    Preferences preferences;
+    preferences.begin(PreferenceNamespace);
+
+    for (unsigned int i = 0; i < MaxSegments; i++)
+    {
+      sprintf(segmentKey, "segment%d", i);
+      unsigned int length = preferences.getUInt(segmentKey, 0);
+      configurations[i] = length;
+    }    
+    
+    preferences.end();
   }
 };
 
