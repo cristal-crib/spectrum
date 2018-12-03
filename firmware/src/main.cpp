@@ -6,9 +6,7 @@
 #define LED_STRIP_PIN 17
 #endif
 
-const uint16_t pixelCount = 10;
-
-LedStripDriver ledStripDriver(pixelCount, LED_STRIP_PIN);
+LedStripDriver ledStripDriver(LED_STRIP_PIN);
 WebDriver webDriver;
 StatusLedDriver statusLedDriver;
 LedStripManager ledStripManager;

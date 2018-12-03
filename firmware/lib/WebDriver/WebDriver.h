@@ -38,8 +38,6 @@ public:
       _stripState[i].saturation = 100;
       _stripState[i].hue = 225;
       _stripState[i].index = i;
-
-      xQueueSend(_stripCommandQueue, &(_stripState[i]), portMAX_DELAY);
     }
 
     _webServer = new AsyncWebServer(80);
@@ -104,20 +102,14 @@ public:
       request->send(200);
     });
 
-    _webServer->on("/stripConfig", [&](AsyncWebServerRequest *request)
+    _webServer->on("/stripconfig", [&](AsyncWebServerRequest *request)
     {
       if (request->hasParam("length"))
       {
         StripSegment segment;
-        if (request->hasParam("index"))
-        {
-          segment.index = request->getParam("index")->value().toInt();
-        }
-        else
-        {
-          segment.index = 0;
-        }
+        segment.index = GetIndex(request);
         segment.lenght = request->getParam("length")->value().toInt();
+        
         xQueueSend(_stripConfigQueue, &segment, portMAX_DELAY);
         request->send(200, "text/plain", "Segment(" + String(segment.index) + ") was set to " + String(segment.lenght) + " of lenght.");
       }
