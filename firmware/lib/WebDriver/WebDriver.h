@@ -107,15 +107,9 @@ public:
       if (request->hasParam("length"))
       {
         StripSegment segment;
-        if (request->hasParam("index"))
-        {
-          segment.index = request->getParam("index")->value().toInt();
-        }
-        else
-        {
-          segment.index = 0;
-        }
+        segment.index = GetIndex(request);
         segment.lenght = request->getParam("length")->value().toInt();
+        
         xQueueSend(_stripConfigQueue, &segment, portMAX_DELAY);
         request->send(200, "text/plain", "Segment(" + String(segment.index) + ") was set to " + String(segment.lenght) + " of lenght.");
       }

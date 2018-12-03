@@ -53,7 +53,7 @@ private:
       _ledStripDriver->ConfigureSegment(segment);
     }
 
-    //_ledStripDriver->SetFullStripColor(White);
+    _ledStripDriver->SetFullStripColor(White);
   }
 
   static void Loop(void *parameter)
@@ -67,12 +67,12 @@ private:
         Serial.println("StripManager: Received new strip command: H " + String(_receivedState.hue) + " S " + String(_receivedState.saturation) + " B " + String(_receivedState.brightness));
         if (_receivedState.onOff == 0)
         {
-          _ledStripDriver->SetFullStripColor(Zero);
+          _ledStripDriver->SetSegmentColor(_receivedState.index, Zero);
         }
         else
         {
           HsbColor color(_receivedState.hue / 360.0f, _receivedState.saturation/100.0f, _receivedState.brightness/100.f);
-          _ledStripDriver->SetFullStripColor(color);
+          _ledStripDriver->SetSegmentColor(_receivedState.index, color);
         }
       }
 
