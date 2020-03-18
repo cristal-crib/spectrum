@@ -21,7 +21,7 @@ struct LedColor_t
 #define STATUS_LED_RED_PIN 26
 #define STATUS_LED_GREEN_PIN 27
 #define STATUS_LED_BLUE_PIN 25
-#elif BOARD_VERSION == 2
+#elif BOARD_VERSION == 2 || BOARD_VERSION == 4
 #define STATUS_LED_RED_PIN 14
 #define STATUS_LED_GREEN_PIN 12
 #define STATUS_LED_BLUE_PIN 27
@@ -57,6 +57,7 @@ private:
         WriteLedValue(_ledColor);
         break;
       case Breathe:
+        ExecutePulseFrame();
         break;
       case Pulse:
         ExecutePulseFrame();
